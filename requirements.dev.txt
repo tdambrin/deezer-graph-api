@@ -1,0 +1,8 @@
+pur
+pre-commit
+black
+isort
+flake8
+pylint
+mypy
+bandit

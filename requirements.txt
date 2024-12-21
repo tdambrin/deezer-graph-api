@@ -1,0 +1,10 @@
+pyyaml
+deezer-python
+networkx
+pydantic
+numpy
+# retry # to avoid fetching nodes already in the graph
+
+# Api
+uvicorn
+fastapi
