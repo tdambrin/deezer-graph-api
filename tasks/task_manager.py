@@ -5,9 +5,10 @@ Task Manager to instantiate and handle tasks
 import uuid
 from typing import Any, Dict, List, Optional
 
+import networkx as nx  # type: ignore
+
 import commons
 import constants
-import networkx as nx  # type: ignore
 from api_clients.wrappers import DeezerWrapper
 from config import OUTPUT_DIR
 from items.item import ValidItem
@@ -61,7 +62,6 @@ class TaskManager:
             task_uuid=task_id,
             use_threading=True,
             keywords=keywords,
-            save=save,
             task_id=task_id,
         )
         task.run()
@@ -81,7 +81,6 @@ class TaskManager:
     def expand_from_query_node(
         self,
         keywords: List[str],
-        save: bool = False,
         task_id: Optional[str] = None,
     ) -> Dict[str, List[Dict[str, Any]]]:
         """
@@ -89,7 +88,6 @@ class TaskManager:
 
         Args:
             keywords: list of keywords to search
-            save: whether to save the graph's output as html
             task_id (str): if provided, set intermediate results to task
         """
         assert (

@@ -294,8 +294,6 @@ class DeezerWrapper:
             ),
         ).ratio()
 
-        # start = time.time()
-
         # Weight of type priority
         w_type = types_priority.index(candidate.type) / max(
             len(types_priority) - 1, 1
@@ -373,6 +371,7 @@ class DeezerWrapper:
             depth=1,
             task_id=task_id,
             is_backbone=True,
+            color=config.NodeColor.BACKBONE,
         )
 
         ItemStore().relate(
@@ -487,6 +486,7 @@ class DeezerWrapper:
             selected_types=[backbone_type],
             task_id=task_id,
             is_backbone=True,
+            color=config.NodeColor.BACKBONE,
         )
 
         ItemStore().relate(
@@ -512,7 +512,6 @@ class DeezerWrapper:
                 star_types=star_types,
                 task_id=task_id,
                 exploration_mode=exploration_mode,
-                color=config.NodeColor.BACKBONE,
             )
 
         # Then get star
