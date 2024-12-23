@@ -6,6 +6,7 @@ Contains:
     - DeezerItem (parent class)
     - one class for each deezer item type
 """
+
 import random
 from enum import Enum
 from math import sqrt
@@ -14,7 +15,7 @@ from typing import Annotated, Any, Dict, List, Tuple
 import deezer  # type: ignore
 from commons import scale_weights
 from config import NodeColor
-from deezer.exceptions import DeezerErrorResponse
+from deezer.exceptions import DeezerErrorResponse  # type: ignore
 from pydantic import BaseModel
 from pydantic.functional_validators import BeforeValidator
 
@@ -371,7 +372,9 @@ class ResourceFactory(BaseModel):
     @property
     def popularity(
         self,
-    ) -> int:  # fixMe - not very contrasted, add some kind of log function for artist
+    ) -> (
+        int
+    ):  # fixMe - not very contrasted, add some kind of log function for artist
         """is a percent"""
         return int(
             sqrt(self.popularity_indicator / self.popularity_upper) * 100

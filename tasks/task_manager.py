@@ -5,8 +5,6 @@ Task Manager to instantiate and handle tasks
 import uuid
 from typing import Any, Dict, List, Optional
 
-import networkx as nx  # type: ignore
-
 import commons
 import constants
 from api_clients.wrappers import DeezerWrapper
@@ -14,6 +12,8 @@ from config import OUTPUT_DIR
 from items.item import ValidItem
 from items.store import ItemStore
 from tasks.task import Task
+
+import networkx as nx  # type: ignore # isort: skip
 
 
 class TaskManager:

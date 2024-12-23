@@ -30,9 +30,9 @@ flake8:
 	$(PYTHON) -m flake8 --per-file-ignores="__init__.py:F401" .
 
 bandit:
-	$(PYTHON) -m bandit -r app
+	$(PYTHON) -m bandit -c pyproject.toml -r .
 
-lint: isort black mypy flake8 bandit
+lint: isort black mypy bandit flake8
 
 install: install-deps
 

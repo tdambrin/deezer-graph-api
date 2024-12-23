@@ -12,7 +12,9 @@ import yaml
 
 
 def random_color_generator():
-    color = random.choice(list(constants.CSS4_COLORS.values())).lower()
+    color = random.choice(
+        list(constants.CSS4_COLORS.values())
+    ).lower()  # nosec B311
     return color
 
 

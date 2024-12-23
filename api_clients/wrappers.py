@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set, Union
 
 import commons
 import config
-import deezer
+import deezer  # type: ignore
 from commons import utils
 from items import DeezerResource, ItemStore, ResourceFactory, ValidItem
 
@@ -20,7 +20,9 @@ class DeezerWrapper:
         ValidItem.ARTIST.value,
         ValidItem.TRACK.value,
         # ValidItem.PLAYLIST.value,
-        # ValidItem.SHOW.value, ValidItem.EPISODE.value, ValidItem.AUDIOBOOK.value,
+        # ValidItem.SHOW.value,
+        # ValidItem.EPISODE.value,
+        # ValidItem.AUDIOBOOK.value,
     ]
 
     # Backbone type selector
@@ -207,7 +209,7 @@ class DeezerWrapper:
         )
 
         # select the #limit best ones
-        best_candidates = {}
+        best_candidates: Dict[int, ResourceFactory] = {}
         for candidate_resource in all_candidates:
             for converted in ResourceFactory(
                 resource=candidate_resource
@@ -593,7 +595,7 @@ class DeezerWrapper:
             session_id=session_id,
             graph_key=graph_key,
             items_=list(filled),
-            depth=depth + 2,
+            depth=(depth or 0) + 2,
             task_id=task_id,
             is_backbone=False,
             color=color or commons.random_color_generator(),
@@ -614,7 +616,7 @@ class DeezerWrapper:
     def recommend_from_item(
         item_: DeezerResource,
         limit_per_type: Dict[str, int],
-        exploration_mode: Dict[str, bool] = None,
+        exploration_mode: Dict[str, bool] | None = None,
     ) -> Set[DeezerResource]:
         """
         Get recommendation results from item. Add items to ItemStore

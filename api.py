@@ -232,7 +232,7 @@ def get_task_status(task_id: str) -> Dict[str, Any]:
             "error": str if any,
             **task_result if task result is dict else "result": single result
         }
-    """
+    """  # noqa: E501
     return StatusManager().get_status_and_result(task_id=task_id)
 
 
@@ -247,7 +247,7 @@ def get_all_tasks() -> List[Dict[str, Any]]:
             "error": str if any,
             "result": task result
         }]
-    """
+    """  # noqa: E501
     return StatusManager().all_tasks
 
 

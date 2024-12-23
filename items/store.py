@@ -251,7 +251,7 @@ class ItemStore(metaclass=ThreadSafeSingleton):
     def relate(
         self,
         session_id: str,
-        graph_key: str | int,
+        graph_key: str,
         parent_id: str | int,
         children_ids: Set[str],
         task_id: Optional[str] = None,
