@@ -1,13 +1,15 @@
 import functools
 import json
-from difflib import SequenceMatcher
 from typing import Dict, List, Optional, Set, Union
 
 import commons
 import config
 import deezer  # type: ignore
+import items
 from commons import utils
 from items import DeezerResource, ItemStore, ResourceFactory, ValidItem
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from .clients import deezer_client
 
@@ -262,9 +264,9 @@ class DeezerWrapper:
     ) -> float:
         """
         Compute a match score for candidate given query keywords and advanced modes.
-        Formula: 2 * w_str - .1 * w_type + w_pop, all weights in [0..1]
+        Formula: w_str - .1 * w_type + .5 * w_pop, all weights in [0..1]
         where:
-            - w_str: SequenceMatcher().ratio for candidate - SequenceMatcher().ratio for champion
+            - w_str: cosine distance of candidate full name and keywords
             - w_type: penalty of type priority (0 if candidate type is first in types_priority)
             - w_pop: +/- a normalized popularity score.
                      - if hipster_mode
@@ -283,18 +285,10 @@ class DeezerWrapper:
         factory_ = ResourceFactory(resource=candidate)
 
         # Weight of keywords match
-        max_full_name_len = 30 + 70 + 70  # artist + album + track
-        w_str = SequenceMatcher(
-            None,
-            utils.order_words(
-                keywords.lower(), sep=" ", fixed_len=max_full_name_len
-            ),
-            utils.order_words(
-                factory_.full_name.lower(),
-                sep=" ",
-                fixed_len=max_full_name_len,
-            ),
-        ).ratio()
+        tfidf_matrix = TfidfVectorizer().fit_transform(
+            [keywords.lower(), factory_.full_name.lower()]
+        )
+        w_str = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])
 
         # Weight of type priority
         w_type = types_priority.index(candidate.type) / max(
@@ -304,17 +298,11 @@ class DeezerWrapper:
         # Weight of popularity (people usually search for popular things unless hipster mode activated)
         hipster_multiplier = -1 if hipster_mode else 1
 
-        # Deactivated to simplify - Thresholds
-        # distance = factory_.popularity_distance
-        # bound = 0 if distance < 0 else DeezerWrapper.POPULARITY_UPPERS[candidate.type]
-        # normalization_factor = abs(bound - factory_.popularity_threshold)
-        # w_pop = hipster_multiplier * (distance / normalization_factor)
-
         w_pop = (
             hipster_multiplier * factory_.popularity / 100
         )  # popularity is a percent
 
-        return 2 * w_str - 0.1 * w_type + w_pop
+        return w_str - 0.1 * w_type + 0.5 * w_pop
 
     def search(
         self,
@@ -384,6 +372,7 @@ class DeezerWrapper:
             task_id=task_id,
             is_backbone=True,
             color=config.NodeColor.BACKBONE,
+            title=config.EdgeLabel.FOUND,
         )
 
         # Expand search
@@ -501,6 +490,7 @@ class DeezerWrapper:
             task_id=task_id,
             is_backbone=False,
             color=config.NodeColor.BACKBONE,
+            title=config.EdgeLabel.RELATED,
         )
 
         if backbone_extension:  # bfs
@@ -553,6 +543,7 @@ class DeezerWrapper:
                 color=config.NodeColor.BACKBONE,
                 hidden=True,
                 is_backbone=False,
+                title=config.EdgeLabel.AUTHOR,
             )
             return star_items
         return []
@@ -568,6 +559,7 @@ class DeezerWrapper:
         color: str | None = None,
     ):
         """
+        Extract restricted_types from item e.g. album from track, track from artist, etc
 
         Args:
             session_id (str): user session identifier
@@ -581,6 +573,9 @@ class DeezerWrapper:
         alternative_types = [
             type_ for type_ in restricted_types if type_ != item_.type
         ]
+        if not alternative_types:
+            return
+
         limit_per_type = DeezerWrapper._scale_per_type(
             limit=DeezerWrapper.REC_SIZE, restricted_types=alternative_types
         )
@@ -610,6 +605,9 @@ class DeezerWrapper:
             color=config.NodeColor.BACKBONE,
             hidden=True,
             is_backbone=False,
+            title=config.EdgeLabel.AUTHOR
+            if item_.type == items.ValidItem.ARTIST.value
+            else config.EdgeLabel.PART_OF,
         )
 
     @staticmethod

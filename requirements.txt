@@ -3,6 +3,7 @@ deezer-python
 networkx
 pydantic
 numpy
+scikit-learn
 # retry # to avoid fetching nodes already in the graph
 
 # Api
