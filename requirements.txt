@@ -9,3 +9,4 @@ scikit-learn
 # Api
 uvicorn
 fastapi
+apitally[fastapi]

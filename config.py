@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from pathlib import Path
 
@@ -12,6 +13,7 @@ OUTPUT_DIR = PROJECT_ROOT / "outputs"
 CONF = load_from_yml(PROJECT_ROOT / "conf.yml")
 
 # --- API ---
+APITALLY_CLIENT_ID = os.environ.get("APITALLY_CLIENT_ID")
 API_HOST = CONF.get("DZG_API_HOST", "localhost")
 API_PORT = int(CONF.get("DZG_API_PORT", 8502)) or None
 

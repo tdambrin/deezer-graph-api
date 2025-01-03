@@ -50,6 +50,19 @@ dzg_api.add_middleware(
     allow_headers=["*"],
 )
 
+if config.APITALLY_CLIENT_ID is not None:
+    from apitally.fastapi import ApitallyMiddleware, RequestLoggingConfig
+
+    dzg_api.add_middleware(
+        ApitallyMiddleware,
+        client_id=config.APITALLY_CLIENT_ID,
+        env="prod",
+        request_logging_config=RequestLoggingConfig(
+            enabled=True,
+            log_query_params=True,
+            log_request_body=True,
+        ),
+    )
 
 # --- Sessions ---
 
